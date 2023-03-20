@@ -15,29 +15,9 @@ from mplsoccer import Radar
 import io
 import requests
 
-# Reemplaza con el ID del archivo de Google Drive que deseas utilizar
-GOOGLE_DRIVE_FILE_ID = '1p6t_XxbtG7YiFP8QWhw8HTVV4GZNCOxa'
-
-def download_google_drive_file(file_id):
-    url = f"https://docs.google.com/spreadsheets/d/1p6t_XxbtG7YiFP8QWhw8HTVV4GZNCOxa/edit?usp=sharing&ouid=114362841776737485141&rtpof=true&sd=true"
-    response = requests.get(url)
-    if response.status_code == 200:
-        content_type = response.headers.get('content-type')
-        if content_type == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
-            return io.BytesIO(response.content)
-        else:
-            raise ValueError(f"El archivo no es un archivo Excel válido. Tipo de contenido: {content_type}")
-    else:
-        raise ValueError(f"Error al descargar el archivo. Código de estado: {response.status_code}")
-
-
-@st.cache
-def load_data(file_id):
-    file_stream = download_google_drive_file(file_id)
-    data = pd.read_excel(file_stream)
+def load_data(uploaded_file):
+    data = pd.read_excel(uploaded_file)
     return data
-
-data = load_data(GOOGLE_DRIVE_FILE_ID)
 
 st.set_option('deprecation.showfileUploaderEncoding', False)
 
