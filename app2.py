@@ -12,15 +12,33 @@ import pandas as pd
 import io
 import matplotlib.pyplot as plt
 from mplsoccer import Radar
+import io
+import requests
+
+# Reemplaza con el ID del archivo de Google Drive que deseas utilizar
+GOOGLE_DRIVE_FILE_ID = '1p6t_XxbtG7YiFP8QWhw8HTVV4GZNCOxa'
+
+def download_google_drive_file(file_id):
+    url = f"https://docs.google.com/spreadsheets/d/1p6t_XxbtG7YiFP8QWhw8HTVV4GZNCOxa/edit?usp=sharing&ouid=114362841776737485141&rtpof=true&sd=true"
+    response = requests.get(url)
+    return io.BytesIO(response.content)
+
+@st.cache
+def load_data(file_id):
+    file_stream = download_google_drive_file(file_id)
+    data = pd.read_excel(file_stream)
+    return data
+
+data = load_data(GOOGLE_DRIVE_FILE_ID)
 
 st.set_option('deprecation.showfileUploaderEncoding', False)
 
 st.title("Comparación de jugadores con gráfico de radar")
 
 @st.cache
-def load_data(uploaded_file):
-    data = pd.read_excel(uploaded_file)
-    return data
+#def load_data(uploaded_file):
+#    data = pd.read_excel(uploaded_file)
+#    return data
 
 def plot_radar(data, spieler1, spieler2, params):
     if not isinstance(params, list):
@@ -86,7 +104,7 @@ def main():
     uploaded_file = st.file_uploader("Carga tus datos en formato Excel", type=['xls', 'xlsx'])
     if uploaded_file is not None:
         data = load_data(uploaded_file)
-        team_options = data['Fußballmannschaft'].unique()
+        team_options = data['Team innerhalb des gewählten Zeitraumes'].unique()
 
         st.sidebar.title("Selecciona los jugadores")
 
