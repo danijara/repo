@@ -21,7 +21,15 @@ GOOGLE_DRIVE_FILE_ID = '1p6t_XxbtG7YiFP8QWhw8HTVV4GZNCOxa'
 def download_google_drive_file(file_id):
     url = f"https://docs.google.com/spreadsheets/d/1p6t_XxbtG7YiFP8QWhw8HTVV4GZNCOxa/edit?usp=sharing&ouid=114362841776737485141&rtpof=true&sd=true"
     response = requests.get(url)
-    return io.BytesIO(response.content)
+    if response.status_code == 200:
+        content_type = response.headers.get('content-type')
+        if content_type == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+            return io.BytesIO(response.content)
+        else:
+            raise ValueError(f"El archivo no es un archivo Excel válido. Tipo de contenido: {content_type}")
+    else:
+        raise ValueError(f"Error al descargar el archivo. Código de estado: {response.status_code}")
+
 
 @st.cache
 def load_data(file_id):
